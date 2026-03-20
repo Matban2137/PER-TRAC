@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="clr-namespace:PerTrac.ViewModels"
         xmlns:lvc="clr-namespace:LiveChartsCore.SkiaSharpView.WPF;assembly=LiveChartsCore.SkiaSharpView.WPF"
-        xmlns:lvs="clr-namespace:LiveChartsCore.SkiaSharpView;assembly=LiveChartsCore.SkiaSharpView"
+
         xmlns:converters="clr-namespace:PerTrac.Converters"
         Title="PER-TRAC  |  Performance Tracker"
         Width="1280" Height="800"
@@ -117,17 +117,10 @@
 
                             <!-- Chart -->
                             <lvc:CartesianChart Grid.Row="2" Series="{Binding CpuSeries}"
-                                                Style="{StaticResource HiddenAxisStyle}"
+                                                XAxes="{Binding HiddenXAxes}"
+                                                YAxes="{Binding PercentYAxes}"
                                                 TooltipPosition="Hidden"
-                                                ZoomMode="None">
-                                <lvc:CartesianChart.XAxes>
-                                    <lvs:Axis ShowSeparatorLines="False" IsVisible="False"/>
-                                </lvc:CartesianChart.XAxes>
-                                <lvc:CartesianChart.YAxes>
-                                    <lvs:Axis MinLimit="0" MaxLimit="100"
-                                              ShowSeparatorLines="False" IsVisible="False"/>
-                                </lvc:CartesianChart.YAxes>
-                            </lvc:CartesianChart>
+                                                ZoomMode="None"/>
 
                             <!-- Core Usages -->
                             <ItemsControl Grid.Row="3" ItemsSource="{Binding CoreUsages}" Margin="0,8,0,0">
@@ -188,17 +181,10 @@
                             </Grid>
 
                             <lvc:CartesianChart Grid.Row="2" Series="{Binding RamSeries}"
-                                                Style="{StaticResource HiddenAxisStyle}"
+                                                XAxes="{Binding HiddenXAxes}"
+                                                YAxes="{Binding PercentYAxes}"
                                                 TooltipPosition="Hidden"
-                                                ZoomMode="None">
-                                <lvc:CartesianChart.XAxes>
-                                    <lvs:Axis ShowSeparatorLines="False" IsVisible="False"/>
-                                </lvc:CartesianChart.XAxes>
-                                <lvc:CartesianChart.YAxes>
-                                    <lvs:Axis MinLimit="0" MaxLimit="100"
-                                              ShowSeparatorLines="False" IsVisible="False"/>
-                                </lvc:CartesianChart.YAxes>
-                            </lvc:CartesianChart>
+                                                ZoomMode="None"/>
 
                             <!-- RAM bar visual -->
                             <Grid Grid.Row="3" Margin="0,8,0,0">
@@ -258,17 +244,10 @@
                             </Grid>
 
                             <lvc:CartesianChart Grid.Row="2" Series="{Binding GpuSeries}"
-                                                Style="{StaticResource HiddenAxisStyle}"
+                                                XAxes="{Binding HiddenXAxes}"
+                                                YAxes="{Binding PercentYAxes}"
                                                 TooltipPosition="Hidden"
-                                                ZoomMode="None">
-                                <lvc:CartesianChart.XAxes>
-                                    <lvs:Axis ShowSeparatorLines="False" IsVisible="False"/>
-                                </lvc:CartesianChart.XAxes>
-                                <lvc:CartesianChart.YAxes>
-                                    <lvs:Axis MinLimit="0" MaxLimit="100"
-                                              ShowSeparatorLines="False" IsVisible="False"/>
-                                </lvc:CartesianChart.YAxes>
-                            </lvc:CartesianChart>
+                                                ZoomMode="None"/>
 
                             <!-- GPU details bar -->
                             <Grid Grid.Row="3" Margin="0,8,0,0">
@@ -336,17 +315,10 @@
                             </Grid>
 
                             <lvc:CartesianChart Grid.Row="2" Series="{Binding NetworkSeries}"
-                                                Style="{StaticResource HiddenAxisStyle}"
+                                                XAxes="{Binding HiddenXAxes}"
+                                                YAxes="{Binding NetworkYAxes}"
                                                 TooltipPosition="Hidden"
-                                                ZoomMode="None">
-                                <lvc:CartesianChart.XAxes>
-                                    <lvs:Axis ShowSeparatorLines="False" IsVisible="False"/>
-                                </lvc:CartesianChart.XAxes>
-                                <lvc:CartesianChart.YAxes>
-                                    <lvs:Axis ShowSeparatorLines="False" IsVisible="False"
-                                              MinLimit="0"/>
-                                </lvc:CartesianChart.YAxes>
-                            </lvc:CartesianChart>
+                                                ZoomMode="None"/>
 
                             <StackPanel Grid.Row="3" Orientation="Horizontal" Margin="0,8,0,0">
                                 <Border Background="#2000C864" CornerRadius="4" Padding="8,3" Margin="0,0,8,0">

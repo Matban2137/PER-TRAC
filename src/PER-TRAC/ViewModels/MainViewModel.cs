@@ -88,6 +88,21 @@ public partial class MainViewModel : ObservableObject, IDisposable
     public ISeries[] GpuSeries { get; }
     public ISeries[] NetworkSeries { get; }
 
+    public Axis[] HiddenXAxes { get; } =
+    [
+        new Axis { ShowSeparatorLines = false, IsVisible = false }
+    ];
+
+    public Axis[] PercentYAxes { get; } =
+    [
+        new Axis { MinLimit = 0, MaxLimit = 100, ShowSeparatorLines = false, IsVisible = false }
+    ];
+
+    public Axis[] NetworkYAxes { get; } =
+    [
+        new Axis { MinLimit = 0, ShowSeparatorLines = false, IsVisible = false }
+    ];
+
     public MainViewModel()
     {
         _monitor = new HardwareMonitorService();
