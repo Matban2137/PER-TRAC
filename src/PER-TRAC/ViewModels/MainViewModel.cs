@@ -81,14 +81,48 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
     // Settings
     [ObservableProperty] private bool _isSettingsOpen;
-    [ObservableProperty] private string _customColorHex = "#FF1A1A2E";
     [ObservableProperty] private SolidColorBrush _previewBrush = new(Color.FromRgb(0x1A, 0x1A, 0x2E));
+    [ObservableProperty] private double _colorHue = 240;
+    [ObservableProperty] private double _colorLightness = 14;
+    [ObservableProperty] private LinearGradientBrush _lightnessGradient = CreateLightnessGradient(240);
 
     public bool IsDashboardVisible => !IsSettingsOpen;
 
     partial void OnIsSettingsOpenChanged(bool value)
     {
         OnPropertyChanged(nameof(IsDashboardVisible));
+    }
+
+    partial void OnColorHueChanged(double value)
+    {
+        LightnessGradient = CreateLightnessGradient(value);
+        UpdatePickerPreview();
+    }
+
+    partial void OnColorLightnessChanged(double value)
+    {
+        UpdatePickerPreview();
+    }
+
+    private void UpdatePickerPreview()
+    {
+        PreviewBrush = new SolidColorBrush(HslToColor(ColorHue, 0.6, ColorLightness / 100.0));
+    }
+
+    private static LinearGradientBrush CreateLightnessGradient(double hue)
+    {
+        var brush = new LinearGradientBrush
+        {
+            StartPoint = new Point(0, 0.5),
+            EndPoint = new Point(1, 0.5)
+        };
+        brush.GradientStops.Add(new GradientStop(HslToColor(hue, 0.6, 0.0), 0.0));
+        brush.GradientStops.Add(new GradientStop(HslToColor(hue, 0.6, 0.25), 0.25));
+        brush.GradientStops.Add(new GradientStop(HslToColor(hue, 0.6, 0.5), 0.5));
+        brush.GradientStops.Add(new GradientStop(HslToColor(hue, 0.6, 0.75), 0.75));
+        brush.GradientStops.Add(new GradientStop(HslToColor(hue, 0.6, 1.0), 1.0));
+        brush.Freeze();
+        return brush;
     }
 
     // Charts data
@@ -171,19 +205,83 @@ public partial class MainViewModel : ObservableObject, IDisposable
         try
         {
             var color = (Color)ColorConverter.ConvertFromString(hexColor);
-            var brush = new SolidColorBrush(color);
-            Application.Current.Resources["BackgroundBrush"] = brush;
-            CustomColorHex = hexColor;
-            PreviewBrush = new SolidColorBrush(color);
+            ApplyThemeFromColor(color);
             SettingsService.Save(new AppSettings { BackgroundColor = hexColor });
+
+            // Sync sliders to reflect the applied color
+            ColorToHsl(color, out double h, out _, out double l);
+            _colorHue = h;
+            _colorLightness = l * 100;
+            OnPropertyChanged(nameof(ColorHue));
+            OnPropertyChanged(nameof(ColorLightness));
+            LightnessGradient = CreateLightnessGradient(h);
+            PreviewBrush = new SolidColorBrush(color);
         }
         catch { }
     }
 
     [RelayCommand]
-    private void ApplyCustomColor()
+    private void ApplyPickerColor()
     {
-        ApplyBackgroundColor(CustomColorHex);
+        var color = HslToColor(ColorHue, 0.6, ColorLightness / 100.0);
+        ApplyThemeFromColor(color);
+        var hex = $"#{color.A:X2}{color.R:X2}{color.G:X2}{color.B:X2}";
+        SettingsService.Save(new AppSettings { BackgroundColor = hex });
+    }
+
+    private static void ApplyThemeFromColor(Color baseColor)
+    {
+        ColorToHsl(baseColor, out double h, out double s, out double l);
+
+        var background = baseColor;
+        var surface = HslToColor(h, s, Math.Min(l + 0.08, 1.0));
+        var border = HslToColor(h, s, Math.Min(l + 0.20, 1.0));
+
+        Application.Current.Resources["BackgroundBrush"] = new SolidColorBrush(background);
+        Application.Current.Resources["SurfaceBrush"] = new SolidColorBrush(surface);
+        Application.Current.Resources["BorderBrush"] = new SolidColorBrush(border);
+    }
+
+    private static Color HslToColor(double h, double s, double l)
+    {
+        h = ((h % 360) + 360) % 360;
+        s = Math.Clamp(s, 0, 1);
+        l = Math.Clamp(l, 0, 1);
+
+        double c = (1 - Math.Abs(2 * l - 1)) * s;
+        double x = c * (1 - Math.Abs((h / 60) % 2 - 1));
+        double m = l - c / 2;
+
+        double r, g, b;
+        if (h < 60) { r = c; g = x; b = 0; }
+        else if (h < 120) { r = x; g = c; b = 0; }
+        else if (h < 180) { r = 0; g = c; b = x; }
+        else if (h < 240) { r = 0; g = x; b = c; }
+        else if (h < 300) { r = x; g = 0; b = c; }
+        else { r = c; g = 0; b = x; }
+
+        return Color.FromRgb(
+            (byte)Math.Round((r + m) * 255),
+            (byte)Math.Round((g + m) * 255),
+            (byte)Math.Round((b + m) * 255));
+    }
+
+    private static void ColorToHsl(Color c, out double h, out double s, out double l)
+    {
+        double r = c.R / 255.0, g = c.G / 255.0, b = c.B / 255.0;
+        double max = Math.Max(r, Math.Max(g, b));
+        double min = Math.Min(r, Math.Min(g, b));
+        double delta = max - min;
+
+        l = (max + min) / 2;
+
+        if (delta == 0) { h = 0; s = 0; return; }
+
+        s = l > 0.5 ? delta / (2 - max - min) : delta / (max + min);
+
+        if (max == r) h = ((g - b) / delta + (g < b ? 6 : 0)) * 60;
+        else if (max == g) h = ((b - r) / delta + 2) * 60;
+        else h = ((r - g) / delta + 4) * 60;
     }
 
     private static ISeries[] CreateLineSeries(ObservableCollection<ObservableValue> values, SKColor color)

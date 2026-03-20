@@ -33,8 +33,8 @@
         </Grid.RowDefinitions>
 
         <!-- Header -->
-        <Border Grid.Row="0" Background="{StaticResource SurfaceBrush}"
-                BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,0,0,1"
+        <Border Grid.Row="0" Background="{DynamicResource SurfaceBrush}"
+                BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,0,1"
                 Padding="20,12">
             <Grid>
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
@@ -495,23 +495,47 @@
                                     ToolTip="Deep Purple"/>
                         </WrapPanel>
 
-                        <TextBlock Text="Custom Hex Color" Style="{StaticResource SmallLabel}" Margin="0,16,0,6"/>
-                        <StackPanel Orientation="Horizontal">
-                            <TextBox Text="{Binding CustomColorHex, UpdateSourceTrigger=PropertyChanged}"
-                                     Width="140" FontSize="14" Padding="6,4"
-                                     Background="#20FFFFFF" Foreground="{StaticResource TextPrimaryBrush}"
-                                     BorderBrush="{StaticResource BorderBrush}" VerticalContentAlignment="Center"/>
-                            <Button Content="Apply" Command="{Binding ApplyCustomColorCommand}"
-                                    Margin="8,0,0,0" Padding="16,4"
-                                    Background="{StaticResource AccentBrush}" Foreground="White"
-                                    BorderThickness="0" Cursor="Hand" FontSize="13"/>
-                        </StackPanel>
+                        <!-- Custom Color Picker -->
+                        <TextBlock Text="Custom Color" Style="{StaticResource SmallLabel}" Margin="0,16,0,8"/>
 
-                        <StackPanel Orientation="Horizontal" Margin="0,12,0,0">
-                            <TextBlock Text="Current: " Style="{StaticResource SmallLabel}" VerticalAlignment="Center"/>
-                            <Border Width="40" Height="24" CornerRadius="4"
-                                    Background="{Binding PreviewBrush}"
-                                    BorderBrush="{StaticResource BorderBrush}" BorderThickness="1"/>
+                        <!-- Hue Slider -->
+                        <TextBlock Text="Hue" Style="{StaticResource SmallLabel}" Margin="0,0,0,4"/>
+                        <Border CornerRadius="8" Height="24" ClipToBounds="True" Margin="0,0,0,4">
+                            <Border.Background>
+                                <LinearGradientBrush StartPoint="0,0.5" EndPoint="1,0.5">
+                                    <GradientStop Color="#FFFF0000" Offset="0.0"/>
+                                    <GradientStop Color="#FFFFFF00" Offset="0.167"/>
+                                    <GradientStop Color="#FF00FF00" Offset="0.333"/>
+                                    <GradientStop Color="#FF00FFFF" Offset="0.5"/>
+                                    <GradientStop Color="#FF0000FF" Offset="0.667"/>
+                                    <GradientStop Color="#FFFF00FF" Offset="0.833"/>
+                                    <GradientStop Color="#FFFF0000" Offset="1.0"/>
+                                </LinearGradientBrush>
+                            </Border.Background>
+                            <Slider Minimum="0" Maximum="360"
+                                    Value="{Binding ColorHue, Mode=TwoWay}"
+                                    VerticalAlignment="Center" Margin="4,0"
+                                    Background="Transparent"/>
+                        </Border>
+
+                        <!-- Lightness Slider -->
+                        <TextBlock Text="Lightness" Style="{StaticResource SmallLabel}" Margin="0,8,0,4"/>
+                        <Border CornerRadius="8" Height="24" ClipToBounds="True" Margin="0,0,0,4"
+                                Background="{Binding LightnessGradient}">
+                            <Slider Minimum="0" Maximum="100"
+                                    Value="{Binding ColorLightness, Mode=TwoWay}"
+                                    VerticalAlignment="Center" Margin="4,0"
+                                    Background="Transparent"/>
+                        </Border>
+
+                        <!-- Preview circle + Apply -->
+                        <StackPanel Orientation="Horizontal" Margin="0,12,0,0" HorizontalAlignment="Left">
+                            <Ellipse Width="80" Height="80" Fill="{Binding PreviewBrush}"
+                                     Stroke="{DynamicResource BorderBrush}" StrokeThickness="2"/>
+                            <Button Content="Apply" Command="{Binding ApplyPickerColorCommand}"
+                                    Margin="20,0,0,0" Padding="20,8" VerticalAlignment="Center"
+                                    Background="{StaticResource AccentBrush}" Foreground="White"
+                                    BorderThickness="0" Cursor="Hand" FontSize="14"/>
                         </StackPanel>
                     </StackPanel>
                 </Border>
