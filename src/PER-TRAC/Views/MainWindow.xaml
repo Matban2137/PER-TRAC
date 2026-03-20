@@ -76,7 +76,9 @@
                 <UniformGrid Grid.Row="0" Columns="2">
 
                     <!-- CPU Card -->
-                    <Border Style="{StaticResource CardBorder}">
+                    <Border Style="{StaticResource CardBorder}"
+                            Background="{DynamicResource SurfaceBrush}"
+                            BorderBrush="{DynamicResource BorderBrush}">
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto"/>
@@ -155,7 +157,9 @@
                     </Border>
 
                     <!-- RAM Card -->
-                    <Border Style="{StaticResource CardBorder}">
+                    <Border Style="{StaticResource CardBorder}"
+                            Background="{DynamicResource SurfaceBrush}"
+                            BorderBrush="{DynamicResource BorderBrush}">
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto"/>
@@ -206,7 +210,9 @@
                 <UniformGrid Grid.Row="1" Columns="2">
 
                     <!-- GPU Card -->
-                    <Border Style="{StaticResource CardBorder}">
+                    <Border Style="{StaticResource CardBorder}"
+                            Background="{DynamicResource SurfaceBrush}"
+                            BorderBrush="{DynamicResource BorderBrush}">
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto"/>
@@ -281,7 +287,9 @@
                     </Border>
 
                     <!-- Network Card -->
-                    <Border Style="{StaticResource CardBorder}">
+                    <Border Style="{StaticResource CardBorder}"
+                            Background="{DynamicResource SurfaceBrush}"
+                            BorderBrush="{DynamicResource BorderBrush}">
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto"/>
@@ -339,7 +347,9 @@
                 </UniformGrid>
 
                 <!-- Row 3: Disks -->
-                <Border Grid.Row="2" Style="{StaticResource CardBorder}">
+                <Border Grid.Row="2" Style="{StaticResource CardBorder}"
+                        Background="{DynamicResource SurfaceBrush}"
+                        BorderBrush="{DynamicResource BorderBrush}">
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>
@@ -402,7 +412,9 @@
                 </Border>
 
                 <!-- Row 4: System Info -->
-                <Border Grid.Row="3" Style="{StaticResource CardBorder}">
+                <Border Grid.Row="3" Style="{StaticResource CardBorder}"
+                        Background="{DynamicResource SurfaceBrush}"
+                        BorderBrush="{DynamicResource BorderBrush}">
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>
@@ -462,7 +474,9 @@
                 <TextBlock Text="SETTINGS" Style="{StaticResource CardTitle}" FontSize="16" Margin="0,0,0,12"/>
 
                 <!-- Background Color -->
-                <Border Style="{StaticResource CardBorder}">
+                <Border Style="{StaticResource CardBorder}"
+                        Background="{DynamicResource SurfaceBrush}"
+                        BorderBrush="{DynamicResource BorderBrush}">
                     <StackPanel>
                         <TextBlock Text="Background Color" Style="{StaticResource NormalText}"
                                    FontWeight="SemiBold" Margin="0,0,0,12"/>
