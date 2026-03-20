@@ -1,0 +1,467 @@
+<Window x:Class="PerTrac.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="clr-namespace:PerTrac.ViewModels"
+        xmlns:lvc="clr-namespace:LiveChartsCore.SkiaSharpView.WPF;assembly=LiveChartsCore.SkiaSharpView.WPF"
+        xmlns:converters="clr-namespace:PerTrac.Converters"
+        Title="PER-TRAC  |  Performance Tracker"
+        Width="1280" Height="800"
+        MinWidth="900" MinHeight="600"
+        Background="{StaticResource BackgroundBrush}"
+        WindowStartupLocation="CenterScreen">
+
+    <Window.DataContext>
+        <vm:MainViewModel/>
+    </Window.DataContext>
+
+    <Window.Resources>
+        <converters:TemperatureToColorConverter x:Key="TempToColor"/>
+        <converters:UsageToColorConverter x:Key="UsageToColor"/>
+
+        <!-- Shared chart axes: hidden, 0-100 range -->
+        <Style x:Key="HiddenAxisStyle" TargetType="lvc:CartesianChart">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Margin" Value="0,8,0,0"/>
+        </Style>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <Border Grid.Row="0" Background="{StaticResource SurfaceBrush}"
+                BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,0,0,1"
+                Padding="20,12">
+            <Grid>
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <TextBlock Text="PER-TRAC" FontSize="20" FontWeight="Bold"
+                               Foreground="{StaticResource AccentBrush}"/>
+                    <TextBlock Text="  |  Performance Tracker" FontSize="14"
+                               Foreground="{StaticResource TextSecondaryBrush}"
+                               VerticalAlignment="Center" Margin="4,0,0,0"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                    <TextBlock Style="{StaticResource SmallLabel}" VerticalAlignment="Center">
+                        <Run Text="{Binding ComputerName, Mode=OneWay}"/>
+                        <Run Text="  |  "/>
+                        <Run Text="Uptime: "/>
+                        <Run Text="{Binding UptimeText, Mode=OneWay}"/>
+                    </TextBlock>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Main Content -->
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto"
+                      HorizontalScrollBarVisibility="Disabled" Padding="8">
+            <Grid Margin="8">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <!-- Row 1: CPU and RAM -->
+                <UniformGrid Grid.Row="0" Columns="2">
+
+                    <!-- CPU Card -->
+                    <Border Style="{StaticResource CardBorder}">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="120"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <!-- Title -->
+                            <Grid Grid.Row="0">
+                                <TextBlock Style="{StaticResource CardTitle}" Text="CPU"/>
+                                <TextBlock Style="{StaticResource SmallLabel}" HorizontalAlignment="Right"
+                                           Text="{Binding CpuName, Mode=OneWay}"/>
+                            </Grid>
+
+                            <!-- Usage + Temp -->
+                            <Grid Grid.Row="1">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel>
+                                    <TextBlock Style="{StaticResource BigValue}"
+                                               Text="{Binding CpuUsageText, Mode=OneWay}"
+                                               Foreground="{Binding CpuUsage, Converter={StaticResource UsageToColor}, Mode=OneWay}"/>
+                                    <TextBlock Style="{StaticResource DetailText}" Margin="0,2,0,0">
+                                        <Run Text="{Binding CpuClockSpeed, StringFormat='{}{0:F0} MHz', Mode=OneWay}"/>
+                                        <Run Text="  |  "/>
+                                        <Run Text="{Binding CpuPower, StringFormat='{}{0:F1} W', Mode=OneWay}"/>
+                                    </TextBlock>
+                                </StackPanel>
+                                <StackPanel Grid.Column="1" HorizontalAlignment="Right">
+                                    <TextBlock FontSize="24" FontWeight="Bold"
+                                               Text="{Binding CpuTempText, Mode=OneWay}"
+                                               Foreground="{Binding CpuTemperature, Converter={StaticResource TempToColor}, Mode=OneWay}"/>
+                                    <TextBlock Style="{StaticResource SmallLabel}" HorizontalAlignment="Right">
+                                        <Run Text="{Binding CpuCoreCount, Mode=OneWay}"/>
+                                        <Run Text="C / "/>
+                                        <Run Text="{Binding CpuThreadCount, Mode=OneWay}"/>
+                                        <Run Text="T"/>
+                                    </TextBlock>
+                                </StackPanel>
+                            </Grid>
+
+                            <!-- Chart -->
+                            <lvc:CartesianChart Grid.Row="2" Series="{Binding CpuSeries}"
+                                                Style="{StaticResource HiddenAxisStyle}"
+                                                TooltipPosition="Hidden"
+                                                ZoomMode="None">
+                                <lvc:CartesianChart.XAxes>
+                                    <lvc:Axis ShowSeparatorLines="False" IsVisible="False"/>
+                                </lvc:CartesianChart.XAxes>
+                                <lvc:CartesianChart.YAxes>
+                                    <lvc:Axis MinLimit="0" MaxLimit="100"
+                                              ShowSeparatorLines="False" IsVisible="False"/>
+                                </lvc:CartesianChart.YAxes>
+                            </lvc:CartesianChart>
+
+                            <!-- Core Usages -->
+                            <ItemsControl Grid.Row="3" ItemsSource="{Binding CoreUsages}" Margin="0,8,0,0">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <WrapPanel/>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border Background="#20FFFFFF" CornerRadius="4"
+                                                Padding="6,3" Margin="2">
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Text="{Binding Label}" FontSize="10"
+                                                           Foreground="{StaticResource TextSecondaryBrush}"
+                                                           Margin="0,0,6,0"/>
+                                                <TextBlock Text="{Binding UsageText}" FontSize="10"
+                                                           FontWeight="SemiBold"
+                                                           Foreground="{Binding Usage, Converter={StaticResource UsageToColor}}"/>
+                                            </StackPanel>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </Grid>
+                    </Border>
+
+                    <!-- RAM Card -->
+                    <Border Style="{StaticResource CardBorder}">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="120"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Grid.Row="0" Style="{StaticResource CardTitle}" Text="MEMORY"/>
+
+                            <Grid Grid.Row="1">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel>
+                                    <TextBlock Style="{StaticResource BigValue}"
+                                               Text="{Binding RamUsageText, Mode=OneWay}"
+                                               Foreground="{Binding RamUsagePercent, Converter={StaticResource UsageToColor}, Mode=OneWay}"/>
+                                    <TextBlock Style="{StaticResource DetailText}"
+                                               Text="{Binding RamDetailText, Mode=OneWay}" Margin="0,2,0,0"/>
+                                </StackPanel>
+                                <StackPanel Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center">
+                                    <TextBlock Style="{StaticResource NormalText}" HorizontalAlignment="Right">
+                                        <Run Text="{Binding RamAvailableGB, StringFormat='{}{0:F1} GB', Mode=OneWay}"/>
+                                        <Run Text=" free"/>
+                                    </TextBlock>
+                                </StackPanel>
+                            </Grid>
+
+                            <lvc:CartesianChart Grid.Row="2" Series="{Binding RamSeries}"
+                                                Style="{StaticResource HiddenAxisStyle}"
+                                                TooltipPosition="Hidden"
+                                                ZoomMode="None">
+                                <lvc:CartesianChart.XAxes>
+                                    <lvc:Axis ShowSeparatorLines="False" IsVisible="False"/>
+                                </lvc:CartesianChart.XAxes>
+                                <lvc:CartesianChart.YAxes>
+                                    <lvc:Axis MinLimit="0" MaxLimit="100"
+                                              ShowSeparatorLines="False" IsVisible="False"/>
+                                </lvc:CartesianChart.YAxes>
+                            </lvc:CartesianChart>
+
+                            <!-- RAM bar visual -->
+                            <Grid Grid.Row="3" Margin="0,8,0,0">
+                                <ProgressBar Style="{StaticResource UsageBar}"
+                                             Value="{Binding RamUsagePercent, Mode=OneWay}"
+                                             Foreground="{StaticResource AccentSecondaryBrush}"/>
+                            </Grid>
+                        </Grid>
+                    </Border>
+                </UniformGrid>
+
+                <!-- Row 2: GPU and Network -->
+                <UniformGrid Grid.Row="1" Columns="2">
+
+                    <!-- GPU Card -->
+                    <Border Style="{StaticResource CardBorder}">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="120"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <Grid Grid.Row="0">
+                                <TextBlock Style="{StaticResource CardTitle}" Text="GPU"/>
+                                <TextBlock Style="{StaticResource SmallLabel}" HorizontalAlignment="Right"
+                                           Text="{Binding GpuName, Mode=OneWay}"/>
+                            </Grid>
+
+                            <Grid Grid.Row="1">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel>
+                                    <TextBlock Style="{StaticResource BigValue}"
+                                               Text="{Binding GpuUsageText, Mode=OneWay}"
+                                               Foreground="{Binding GpuUsage, Converter={StaticResource UsageToColor}, Mode=OneWay}"/>
+                                    <TextBlock Style="{StaticResource DetailText}" Margin="0,2,0,0">
+                                        <Run Text="{Binding GpuCoreClock, StringFormat='{}{0:F0} MHz', Mode=OneWay}"/>
+                                        <Run Text="  |  "/>
+                                        <Run Text="{Binding GpuPower, StringFormat='{}{0:F1} W', Mode=OneWay}"/>
+                                    </TextBlock>
+                                </StackPanel>
+                                <StackPanel Grid.Column="1" HorizontalAlignment="Right">
+                                    <TextBlock FontSize="24" FontWeight="Bold"
+                                               Text="{Binding GpuTempText, Mode=OneWay}"
+                                               Foreground="{Binding GpuTemperature, Converter={StaticResource TempToColor}, Mode=OneWay}"/>
+                                    <TextBlock Style="{StaticResource SmallLabel}" HorizontalAlignment="Right">
+                                        <Run Text="VRAM: "/>
+                                        <Run Text="{Binding GpuMemoryUsedMB, StringFormat='{}{0:F0}', Mode=OneWay}"/>
+                                        <Run Text=" / "/>
+                                        <Run Text="{Binding GpuMemoryTotalMB, StringFormat='{}{0:F0} MB', Mode=OneWay}"/>
+                                    </TextBlock>
+                                </StackPanel>
+                            </Grid>
+
+                            <lvc:CartesianChart Grid.Row="2" Series="{Binding GpuSeries}"
+                                                Style="{StaticResource HiddenAxisStyle}"
+                                                TooltipPosition="Hidden"
+                                                ZoomMode="None">
+                                <lvc:CartesianChart.XAxes>
+                                    <lvc:Axis ShowSeparatorLines="False" IsVisible="False"/>
+                                </lvc:CartesianChart.XAxes>
+                                <lvc:CartesianChart.YAxes>
+                                    <lvc:Axis MinLimit="0" MaxLimit="100"
+                                              ShowSeparatorLines="False" IsVisible="False"/>
+                                </lvc:CartesianChart.YAxes>
+                            </lvc:CartesianChart>
+
+                            <!-- GPU details bar -->
+                            <Grid Grid.Row="3" Margin="0,8,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0" Margin="0,0,4,0">
+                                    <TextBlock Style="{StaticResource SmallLabel}" Text="Memory"/>
+                                    <ProgressBar Style="{StaticResource UsageBar}"
+                                                 Value="{Binding GpuMemoryUsagePercent, Mode=OneWay}"
+                                                 Foreground="{StaticResource AccentGreenBrush}"/>
+                                </StackPanel>
+                                <StackPanel Grid.Column="1" Margin="4,0,0,0">
+                                    <TextBlock Style="{StaticResource SmallLabel}">
+                                        <Run Text="Fan: "/>
+                                        <Run Text="{Binding GpuFanSpeed, StringFormat='{}{0:F0} RPM', Mode=OneWay}"/>
+                                    </TextBlock>
+                                    <ProgressBar Style="{StaticResource UsageBar}"
+                                                 Value="{Binding GpuUsage, Mode=OneWay}"
+                                                 Foreground="{StaticResource AccentGreenBrush}"/>
+                                </StackPanel>
+                            </Grid>
+                        </Grid>
+                    </Border>
+
+                    <!-- Network Card -->
+                    <Border Style="{StaticResource CardBorder}">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="120"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <Grid Grid.Row="0">
+                                <TextBlock Style="{StaticResource CardTitle}" Text="NETWORK"/>
+                                <TextBlock Style="{StaticResource SmallLabel}" HorizontalAlignment="Right"
+                                           Text="{Binding NetworkAdapterName, Mode=OneWay}"/>
+                            </Grid>
+
+                            <Grid Grid.Row="1">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel>
+                                    <TextBlock Style="{StaticResource SmallLabel}" Text="Download"/>
+                                    <TextBlock FontSize="22" FontWeight="Bold"
+                                               Foreground="#FF00C864"
+                                               Text="{Binding DownloadSpeedText, Mode=OneWay}"/>
+                                    <TextBlock Style="{StaticResource DetailText}"
+                                               Text="{Binding TotalDownloadedText, Mode=OneWay, StringFormat='Total: {0}'}"/>
+                                </StackPanel>
+                                <StackPanel Grid.Column="1" HorizontalAlignment="Right">
+                                    <TextBlock Style="{StaticResource SmallLabel}" Text="Upload" HorizontalAlignment="Right"/>
+                                    <TextBlock FontSize="22" FontWeight="Bold"
+                                               Foreground="#FFFF6432"
+                                               Text="{Binding UploadSpeedText, Mode=OneWay}"
+                                               HorizontalAlignment="Right"/>
+                                    <TextBlock Style="{StaticResource DetailText}" HorizontalAlignment="Right"
+                                               Text="{Binding TotalUploadedText, Mode=OneWay, StringFormat='Total: {0}'}"/>
+                                </StackPanel>
+                            </Grid>
+
+                            <lvc:CartesianChart Grid.Row="2" Series="{Binding NetworkSeries}"
+                                                Style="{StaticResource HiddenAxisStyle}"
+                                                TooltipPosition="Hidden"
+                                                ZoomMode="None">
+                                <lvc:CartesianChart.XAxes>
+                                    <lvc:Axis ShowSeparatorLines="False" IsVisible="False"/>
+                                </lvc:CartesianChart.XAxes>
+                                <lvc:CartesianChart.YAxes>
+                                    <lvc:Axis ShowSeparatorLines="False" IsVisible="False"
+                                              MinLimit="0"/>
+                                </lvc:CartesianChart.YAxes>
+                            </lvc:CartesianChart>
+
+                            <StackPanel Grid.Row="3" Orientation="Horizontal" Margin="0,8,0,0">
+                                <Border Background="#2000C864" CornerRadius="4" Padding="8,3" Margin="0,0,8,0">
+                                    <TextBlock FontSize="10" Foreground="#FF00C864" Text="Download"/>
+                                </Border>
+                                <Border Background="#20FF6432" CornerRadius="4" Padding="8,3">
+                                    <TextBlock FontSize="10" Foreground="#FFFF6432" Text="Upload"/>
+                                </Border>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+                </UniformGrid>
+
+                <!-- Row 3: Disks -->
+                <Border Grid.Row="2" Style="{StaticResource CardBorder}">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <TextBlock Grid.Row="0" Style="{StaticResource CardTitle}" Text="STORAGE"/>
+
+                        <ItemsControl Grid.Row="1" ItemsSource="{Binding Disks}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <UniformGrid Columns="3"/>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Background="#15FFFFFF" CornerRadius="8"
+                                            Padding="12" Margin="4">
+                                        <StackPanel>
+                                            <TextBlock Style="{StaticResource NormalText}"
+                                                       Text="{Binding Name}" FontWeight="SemiBold"/>
+                                            <Grid Margin="0,6,0,0">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Style="{StaticResource DetailText}"
+                                                           Text="{Binding SpaceText}"/>
+                                                <TextBlock Grid.Column="1" Style="{StaticResource SmallLabel}"
+                                                           Text="{Binding FreeText}"/>
+                                            </Grid>
+                                            <ProgressBar Style="{StaticResource UsageBar}"
+                                                         Value="{Binding UsagePercent, Mode=OneWay}"
+                                                         Foreground="{Binding UsagePercent, Converter={StaticResource UsageToColor}}"/>
+                                            <Grid Margin="0,6,0,0">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Style="{StaticResource SmallLabel}">
+                                                    <Run Text="R: "/>
+                                                    <Run Text="{Binding ReadSpeedMBs, StringFormat='{}{0:F1} MB/s', Mode=OneWay}"/>
+                                                </TextBlock>
+                                                <TextBlock Grid.Column="1" Style="{StaticResource SmallLabel}">
+                                                    <Run Text="W: "/>
+                                                    <Run Text="{Binding WriteSpeedMBs, StringFormat='{}{0:F1} MB/s', Mode=OneWay}"/>
+                                                </TextBlock>
+                                                <TextBlock Grid.Column="2" Style="{StaticResource SmallLabel}"
+                                                           HorizontalAlignment="Right">
+                                                    <Run Text="{Binding Temperature, StringFormat='{}{0:F0}°C', Mode=OneWay}"/>
+                                                </TextBlock>
+                                            </Grid>
+                                        </StackPanel>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </Grid>
+                </Border>
+
+                <!-- Row 4: System Info -->
+                <Border Grid.Row="3" Style="{StaticResource CardBorder}">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <TextBlock Grid.Row="0" Style="{StaticResource CardTitle}" Text="SYSTEM INFORMATION"/>
+
+                        <UniformGrid Grid.Row="1" Columns="3">
+                            <StackPanel Margin="0,0,12,0">
+                                <TextBlock Style="{StaticResource SmallLabel}" Text="Operating System"/>
+                                <TextBlock Style="{StaticResource NormalText}"
+                                           Text="{Binding OsInfo, Mode=OneWay}" TextWrapping="Wrap"/>
+                            </StackPanel>
+                            <StackPanel Margin="0,0,12,0">
+                                <TextBlock Style="{StaticResource SmallLabel}" Text="Motherboard"/>
+                                <TextBlock Style="{StaticResource NormalText}"
+                                           Text="{Binding MotherboardName, Mode=OneWay}" TextWrapping="Wrap"/>
+                                <TextBlock Style="{StaticResource SmallLabel}" Margin="0,4,0,0" Text="BIOS"/>
+                                <TextBlock Style="{StaticResource NormalText}"
+                                           Text="{Binding BiosVersion, Mode=OneWay}" TextWrapping="Wrap"/>
+                            </StackPanel>
+                            <StackPanel>
+                                <TextBlock Style="{StaticResource SmallLabel}" Text="Computer Name"/>
+                                <TextBlock Style="{StaticResource NormalText}"
+                                           Text="{Binding ComputerName, Mode=OneWay}"/>
+                                <TextBlock Style="{StaticResource SmallLabel}" Margin="0,4,0,0" Text="User"/>
+                                <TextBlock Style="{StaticResource NormalText}"
+                                           Text="{Binding UserName, Mode=OneWay}"/>
+                                <TextBlock Style="{StaticResource SmallLabel}" Margin="0,4,0,0" Text="Uptime"/>
+                                <TextBlock Style="{StaticResource NormalText}"
+                                           Text="{Binding UptimeText, Mode=OneWay}"/>
+                            </StackPanel>
+                        </UniformGrid>
+                    </Grid>
+                </Border>
+
+            </Grid>
+        </ScrollViewer>
+    </Grid>
+</Window>
