@@ -1,8 +1,11 @@
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Windows;
+using System.Windows.Media;
 using System.Windows.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using LiveChartsCore;
 using LiveChartsCore.Defaults;
 using LiveChartsCore.SkiaSharpView;
@@ -76,6 +79,18 @@ public partial class MainViewModel : ObservableObject, IDisposable
     // Core usages
     [ObservableProperty] private ObservableCollection<CoreUsageViewModel> _coreUsages = [];
 
+    // Settings
+    [ObservableProperty] private bool _isSettingsOpen;
+    [ObservableProperty] private string _customColorHex = "#FF1A1A2E";
+    [ObservableProperty] private SolidColorBrush _previewBrush = new(Color.FromRgb(0x1A, 0x1A, 0x2E));
+
+    public bool IsDashboardVisible => !IsSettingsOpen;
+
+    partial void OnIsSettingsOpenChanged(bool value)
+    {
+        OnPropertyChanged(nameof(IsDashboardVisible));
+    }
+
     // Charts data
     private readonly ObservableCollection<ObservableValue> _cpuChartValues = [];
     private readonly ObservableCollection<ObservableValue> _ramChartValues = [];
@@ -137,6 +152,38 @@ public partial class MainViewModel : ObservableObject, IDisposable
         _timer.Start();
 
         UpdateAll();
+
+        // Load saved settings
+        var settings = SettingsService.Load();
+        ApplyBackgroundColor(settings.BackgroundColor);
+    }
+
+    [RelayCommand]
+    private void ToggleSettings()
+    {
+        IsSettingsOpen = !IsSettingsOpen;
+    }
+
+    [RelayCommand]
+    private void ApplyBackgroundColor(string? hexColor)
+    {
+        if (string.IsNullOrWhiteSpace(hexColor)) return;
+        try
+        {
+            var color = (Color)ColorConverter.ConvertFromString(hexColor);
+            var brush = new SolidColorBrush(color);
+            Application.Current.Resources["BackgroundBrush"] = brush;
+            CustomColorHex = hexColor;
+            PreviewBrush = new SolidColorBrush(color);
+            SettingsService.Save(new AppSettings { BackgroundColor = hexColor });
+        }
+        catch { }
+    }
+
+    [RelayCommand]
+    private void ApplyCustomColor()
+    {
+        ApplyBackgroundColor(CustomColorHex);
     }
 
     private static ISeries[] CreateLineSeries(ObservableCollection<ObservableValue> values, SKColor color)

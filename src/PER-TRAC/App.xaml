@@ -75,6 +75,8 @@
                 <Setter Property="VerticalScrollBarVisibility" Value="Auto"/>
             </Style>
 
+            <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+
             <!-- Progress Bar Style -->
             <Style x:Key="UsageBar" TargetType="ProgressBar">
                 <Setter Property="Height" Value="6"/>

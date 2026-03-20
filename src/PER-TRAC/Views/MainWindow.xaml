@@ -8,7 +8,7 @@
         Title="PER-TRAC  |  Performance Tracker"
         Width="1280" Height="800"
         MinWidth="900" MinHeight="600"
-        Background="{StaticResource BackgroundBrush}"
+        Background="{DynamicResource BackgroundBrush}"
         WindowStartupLocation="CenterScreen">
 
     <Window.DataContext>
@@ -51,13 +51,19 @@
                         <Run Text="Uptime: "/>
                         <Run Text="{Binding UptimeText, Mode=OneWay}"/>
                     </TextBlock>
+                    <Button Content="&#x2699;" FontSize="20" Margin="16,0,0,0"
+                            Command="{Binding ToggleSettingsCommand}"
+                            Background="Transparent" BorderThickness="0"
+                            Foreground="{StaticResource TextSecondaryBrush}"
+                            Cursor="Hand" Padding="4,0" ToolTip="Settings"/>
                 </StackPanel>
             </Grid>
         </Border>
 
         <!-- Main Content -->
         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto"
-                      HorizontalScrollBarVisibility="Disabled" Padding="8">
+                      HorizontalScrollBarVisibility="Disabled" Padding="8"
+                      Visibility="{Binding IsDashboardVisible, Converter={StaticResource BoolToVis}}">
             <Grid Margin="8">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
@@ -435,6 +441,81 @@
                 </Border>
 
             </Grid>
+        </ScrollViewer>
+
+        <!-- Settings Panel -->
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto"
+                      HorizontalScrollBarVisibility="Disabled"
+                      Visibility="{Binding IsSettingsOpen, Converter={StaticResource BoolToVis}}">
+            <StackPanel MaxWidth="600" HorizontalAlignment="Left" Margin="24">
+
+                <Button Command="{Binding ToggleSettingsCommand}"
+                        Background="Transparent" BorderThickness="0" HorizontalAlignment="Left"
+                        Foreground="{StaticResource AccentBrush}" FontSize="14" Cursor="Hand"
+                        Margin="0,0,0,16" Padding="0">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="&#x2190;" Margin="0,0,6,0"/>
+                        <TextBlock Text="Back"/>
+                    </StackPanel>
+                </Button>
+
+                <TextBlock Text="SETTINGS" Style="{StaticResource CardTitle}" FontSize="16" Margin="0,0,0,12"/>
+
+                <!-- Background Color -->
+                <Border Style="{StaticResource CardBorder}">
+                    <StackPanel>
+                        <TextBlock Text="Background Color" Style="{StaticResource NormalText}"
+                                   FontWeight="SemiBold" Margin="0,0,0,12"/>
+
+                        <TextBlock Text="Presets" Style="{StaticResource SmallLabel}" Margin="0,0,0,8"/>
+                        <WrapPanel>
+                            <Button Width="40" Height="30" Margin="0,0,6,6" Cursor="Hand"
+                                    Background="#FF1A1A2E" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1"
+                                    Command="{Binding ApplyBackgroundColorCommand}" CommandParameter="#FF1A1A2E"
+                                    ToolTip="Default Dark"/>
+                            <Button Width="40" Height="30" Margin="0,0,6,6" Cursor="Hand"
+                                    Background="#FF0D1B2A" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1"
+                                    Command="{Binding ApplyBackgroundColorCommand}" CommandParameter="#FF0D1B2A"
+                                    ToolTip="Midnight Blue"/>
+                            <Button Width="40" Height="30" Margin="0,0,6,6" Cursor="Hand"
+                                    Background="#FF1B2A1B" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1"
+                                    Command="{Binding ApplyBackgroundColorCommand}" CommandParameter="#FF1B2A1B"
+                                    ToolTip="Dark Green"/>
+                            <Button Width="40" Height="30" Margin="0,0,6,6" Cursor="Hand"
+                                    Background="#FF2A1B1B" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1"
+                                    Command="{Binding ApplyBackgroundColorCommand}" CommandParameter="#FF2A1B1B"
+                                    ToolTip="Dark Red"/>
+                            <Button Width="40" Height="30" Margin="0,0,6,6" Cursor="Hand"
+                                    Background="#FF2D2D2D" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1"
+                                    Command="{Binding ApplyBackgroundColorCommand}" CommandParameter="#FF2D2D2D"
+                                    ToolTip="Charcoal"/>
+                            <Button Width="40" Height="30" Margin="0,0,6,6" Cursor="Hand"
+                                    Background="#FF1A1025" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1"
+                                    Command="{Binding ApplyBackgroundColorCommand}" CommandParameter="#FF1A1025"
+                                    ToolTip="Deep Purple"/>
+                        </WrapPanel>
+
+                        <TextBlock Text="Custom Hex Color" Style="{StaticResource SmallLabel}" Margin="0,16,0,6"/>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBox Text="{Binding CustomColorHex, UpdateSourceTrigger=PropertyChanged}"
+                                     Width="140" FontSize="14" Padding="6,4"
+                                     Background="#20FFFFFF" Foreground="{StaticResource TextPrimaryBrush}"
+                                     BorderBrush="{StaticResource BorderBrush}" VerticalContentAlignment="Center"/>
+                            <Button Content="Apply" Command="{Binding ApplyCustomColorCommand}"
+                                    Margin="8,0,0,0" Padding="16,4"
+                                    Background="{StaticResource AccentBrush}" Foreground="White"
+                                    BorderThickness="0" Cursor="Hand" FontSize="13"/>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal" Margin="0,12,0,0">
+                            <TextBlock Text="Current: " Style="{StaticResource SmallLabel}" VerticalAlignment="Center"/>
+                            <Border Width="40" Height="24" CornerRadius="4"
+                                    Background="{Binding PreviewBrush}"
+                                    BorderBrush="{StaticResource BorderBrush}" BorderThickness="1"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
         </ScrollViewer>
     </Grid>
 </Window>
