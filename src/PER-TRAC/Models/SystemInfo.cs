@@ -1,3 +1,5 @@
+using System;
+
 namespace PerTrac.Models;
 
 public class SystemInfo

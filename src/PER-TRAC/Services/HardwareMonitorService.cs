@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using LibreHardwareMonitor.Hardware;
 using PerTrac.Models;
 
