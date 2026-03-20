@@ -3,6 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="clr-namespace:PerTrac.ViewModels"
         xmlns:lvc="clr-namespace:LiveChartsCore.SkiaSharpView.WPF;assembly=LiveChartsCore.SkiaSharpView.WPF"
+        xmlns:lvs="clr-namespace:LiveChartsCore.SkiaSharpView;assembly=LiveChartsCore.SkiaSharpView"
         xmlns:converters="clr-namespace:PerTrac.Converters"
         Title="PER-TRAC  |  Performance Tracker"
         Width="1280" Height="800"
@@ -120,10 +121,10 @@
                                                 TooltipPosition="Hidden"
                                                 ZoomMode="None">
                                 <lvc:CartesianChart.XAxes>
-                                    <lvc:Axis ShowSeparatorLines="False" IsVisible="False"/>
+                                    <lvs:Axis ShowSeparatorLines="False" IsVisible="False"/>
                                 </lvc:CartesianChart.XAxes>
                                 <lvc:CartesianChart.YAxes>
-                                    <lvc:Axis MinLimit="0" MaxLimit="100"
+                                    <lvs:Axis MinLimit="0" MaxLimit="100"
                                               ShowSeparatorLines="False" IsVisible="False"/>
                                 </lvc:CartesianChart.YAxes>
                             </lvc:CartesianChart>
@@ -191,10 +192,10 @@
                                                 TooltipPosition="Hidden"
                                                 ZoomMode="None">
                                 <lvc:CartesianChart.XAxes>
-                                    <lvc:Axis ShowSeparatorLines="False" IsVisible="False"/>
+                                    <lvs:Axis ShowSeparatorLines="False" IsVisible="False"/>
                                 </lvc:CartesianChart.XAxes>
                                 <lvc:CartesianChart.YAxes>
-                                    <lvc:Axis MinLimit="0" MaxLimit="100"
+                                    <lvs:Axis MinLimit="0" MaxLimit="100"
                                               ShowSeparatorLines="False" IsVisible="False"/>
                                 </lvc:CartesianChart.YAxes>
                             </lvc:CartesianChart>
@@ -261,10 +262,10 @@
                                                 TooltipPosition="Hidden"
                                                 ZoomMode="None">
                                 <lvc:CartesianChart.XAxes>
-                                    <lvc:Axis ShowSeparatorLines="False" IsVisible="False"/>
+                                    <lvs:Axis ShowSeparatorLines="False" IsVisible="False"/>
                                 </lvc:CartesianChart.XAxes>
                                 <lvc:CartesianChart.YAxes>
-                                    <lvc:Axis MinLimit="0" MaxLimit="100"
+                                    <lvs:Axis MinLimit="0" MaxLimit="100"
                                               ShowSeparatorLines="False" IsVisible="False"/>
                                 </lvc:CartesianChart.YAxes>
                             </lvc:CartesianChart>
@@ -339,10 +340,10 @@
                                                 TooltipPosition="Hidden"
                                                 ZoomMode="None">
                                 <lvc:CartesianChart.XAxes>
-                                    <lvc:Axis ShowSeparatorLines="False" IsVisible="False"/>
+                                    <lvs:Axis ShowSeparatorLines="False" IsVisible="False"/>
                                 </lvc:CartesianChart.XAxes>
                                 <lvc:CartesianChart.YAxes>
-                                    <lvc:Axis ShowSeparatorLines="False" IsVisible="False"
+                                    <lvs:Axis ShowSeparatorLines="False" IsVisible="False"
                                               MinLimit="0"/>
                                 </lvc:CartesianChart.YAxes>
                             </lvc:CartesianChart>

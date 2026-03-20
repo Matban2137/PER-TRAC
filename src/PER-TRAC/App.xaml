@@ -41,7 +41,7 @@
                 <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}"/>
                 <Setter Property="FontSize" Value="11"/>
                 <Setter Property="FontWeight" Value="SemiBold"/>
-                <Setter Property="TextTransform" Value="Uppercase"/>
+
                 <Setter Property="Margin" Value="0,0,0,8"/>
             </Style>
 
